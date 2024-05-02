@@ -11,7 +11,11 @@ app_name = "htmx"
 urlpatterns = [
     path(
         "accounts/login/",
-        auth_views.LoginView.as_view(extra_context={"oauth2_backends": get_psa_authentication_names()}),
+        views.public(
+            auth_views.LoginView.as_view(
+                extra_context={"oauth2_backends": get_psa_authentication_names()},
+            )
+        ),
         name="login",
     ),
     path("accounts/logout/", auth_views.LogoutView.as_view(), name="logout"),

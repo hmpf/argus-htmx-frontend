@@ -2,7 +2,9 @@ import logging
 from typing import Optional
 
 from django.conf import settings
+from django.contrib.auth import REDIRECT_FIELD_NAME
 from django.contrib.auth.models import Group
+from django.contrib.auth.decorators import login_required, user_passes_test
 from django.core.exceptions import PermissionDenied
 from django.shortcuts import render, reverse, get_object_or_404
 
@@ -11,6 +13,18 @@ from argus.incident.models import Incident
 from .forms import AckForm
 
 LOG = logging.getLogger(__name__)
+
+
+# should be in argus.auth
+def public(function=None):
+    """Decorator to ensure a user is not logged in"""
+    actual_decorator = user_passes_test(
+        lambda u: u.is_anonymous,
+        login_url="/incidents/"  # settings.LOGIN_REDIRECT_URL,
+    )
+    if function:
+        return actual_decorator(function)
+    return actual_decorator
 
 
 def incidents(request):
@@ -39,6 +53,8 @@ def incident_detail(request, pk: int):
     }
     return render(request, "htmx/incidents/incident_detail.html", context=context)
 
+
+@login_required
 def incident_add_ack(request, pk: int, group: Optional[str] = None):
     incident = get_object_or_404(Incident, id=pk)
     is_group_member = None
@@ -63,7 +79,3 @@ def incident_add_ack(request, pk: int, group: Optional[str] = None):
                 expiration=form.cleaned_data["expiration"],
             )
     return render(request, "htmx/incidents/incident_add_ack.html", context=context)
-
-
-# def login(request):
-#     
