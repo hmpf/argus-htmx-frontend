@@ -23,11 +23,13 @@ class HtmxHttpRequest(HttpRequest):
 
 
 def incidents(request):
-    qs = Incident.objects.all().order_by("-start_time")
+    # example without paging
+    qs = Incident.objects.order_by("-start_time")
     latest = qs.latest("start_time").start_time
     context = {
-        "qs": qs,
+        "qs": qs[:5],
         "latest": latest,
+        "count": qs.count(),
         "page_title": "Incidents",
     }
     return render(request, "htmx/incidents/list.html", context=context)
