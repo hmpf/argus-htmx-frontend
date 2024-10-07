@@ -1,3 +1,9 @@
 from django.db import models
 
-# Create your models here.
+from argus_htmx.preferences.models import ArgusHtmxPreferences, NAMESPACE
+
+
+__all__ = [
+    "ArgusHtmxPreferences",
+    "NAMESPACE",
+]
